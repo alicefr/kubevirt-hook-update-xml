@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 
+	types "github.com/alicefr/kubevirt-hook-update-xml/pkg/types"
+	utils "github.com/alicefr/kubevirt-hook-update-xml/pkg/utils"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/hooks"
 	hooksInfo "kubevirt.io/kubevirt/pkg/hooks/info"
@@ -23,6 +24,10 @@ const (
   --version v1alpha1|v1alpha2
   --file /var/run/hooks/config/vm.xml`
 )
+
+func init() {
+	types.Dir = "/var/run/hooks/config"
+}
 
 type infoServer struct {
 	Version string
@@ -55,7 +60,7 @@ type v1alpha2Server struct {
 
 func (s v1alpha2Server) OnDefineDomain(ctx context.Context, params *hooksV1alpha2.OnDefineDomainParams) (*hooksV1alpha2.OnDefineDomainResult, error) {
 	log.Log.Info(onDefineDomainLoggingMessage)
-	newDomainXML, err := onDefineDomain(s.File, params.GetVmi())
+	newDomainXML, err := utils.MergeKubeVirtXMLWithProvidedXML(s.File, params.GetVmi())
 	if err != nil {
 		return nil, err
 	}
@@ -71,18 +76,13 @@ func (s v1alpha2Server) PreCloudInitIso(_ context.Context, params *hooksV1alpha2
 
 func (s v1alpha1Server) OnDefineDomain(ctx context.Context, params *hooksV1alpha1.OnDefineDomainParams) (*hooksV1alpha1.OnDefineDomainResult, error) {
 	log.Log.Info(onDefineDomainLoggingMessage)
-	newDomainXML, err := onDefineDomain(s.File, params.GetVmi())
+	newDomainXML, err := utils.MergeKubeVirtXMLWithProvidedXML(s.File, params.GetVmi())
 	if err != nil {
 		return nil, err
 	}
 	return &hooksV1alpha1.OnDefineDomainResult{
 		DomainXML: newDomainXML,
 	}, nil
-}
-
-func onDefineDomain(file string, vmiJSON []byte) ([]byte, error) {
-	log.Log.Info(onDefineDomainLoggingMessage)
-	return ioutil.ReadFile(fmt.Sprintf("%s/%s", "/var/run/hooks/config", file))
 }
 
 func main() {
