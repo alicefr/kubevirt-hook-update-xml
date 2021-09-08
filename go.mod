@@ -15,10 +15,12 @@ replace (
 )
 
 require (
+	github.com/alicefr/kubevirt-hook-update-xml v0.0.0-00010101000000-000000000000
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.16.0
 	github.com/spf13/pflag v1.0.5
 	google.golang.org/grpc v1.40.0
+	k8s.io/apimachinery v0.20.2
 	kubevirt.io/client-go v0.0.0-00010101000000-000000000000
 	kubevirt.io/kubevirt v0.44.1
 )
