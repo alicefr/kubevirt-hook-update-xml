@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"os"
+	"strings"
 
 	types "github.com/alicefr/kubevirt-hook-update-xml/pkg/types"
 	. "github.com/onsi/ginkgo"
@@ -26,7 +27,8 @@ var _ = Describe("KubevirtHook", func() {
 		}
 		bytes, err := json.Marshal(vmi)
 		Expect(err).NotTo(HaveOccurred())
-		_, err = MergeKubeVirtXMLWithProvidedXML("vmi-fedora.xml", bytes)
+		xml, err := MergeKubeVirtXMLWithProvidedXML("vmi-fedora.xml", bytes)
+		Expect(strings.Contains(string(xml), string(vmi.ObjectMeta.UID))).To(BeTrue())
 		Expect(err).NotTo(HaveOccurred())
 	})
 })
