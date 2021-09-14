@@ -26,6 +26,7 @@ var _ = Describe("KubevirtHook", func() {
 		}
 		bytes, err := json.Marshal(vmi)
 		Expect(err).NotTo(HaveOccurred())
-		MergeKubeVirtXMLWithProvidedXML("vmi-fedora.xml", bytes)
+		_, err = MergeKubeVirtXMLWithProvidedXML("vmi-fedora.xml", bytes)
+		Expect(err).NotTo(HaveOccurred())
 	})
 })
