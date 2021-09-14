@@ -1,6 +1,6 @@
 TAG ?= "latest"
 
-build:
+build: clean
 	go build -o updater main.go
 
 update:
@@ -9,3 +9,6 @@ update:
 
 container:
 	docker build -t updater:$(TAG) .
+
+clean: 
+	rm -f updater
